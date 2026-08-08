@@ -1,0 +1,40 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# 公開しないローカル効果音
+/Assets/Audio/*
+!/Assets/Audio/firework_launch_sample.wav
+!/Assets/Audio/firework_launch_sample.wav.meta
+!/Assets/Audio/firework_explosion_sample.wav
+!/Assets/Audio/firework_explosion_sample.wav.meta
+
+# Unity generated files
+*.csproj
+*.sln
+*.slnx
+*.user
+*.unityproj
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# IDE and OS files
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Unity build reports and crash dumps
+sysinfo.txt
+*.stacktrace
+crashlytics-build.properties
