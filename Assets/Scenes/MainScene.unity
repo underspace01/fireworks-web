@@ -268,9 +268,6 @@ GameObject:
   - component: {fileID: 202}
   - component: {fileID: 203}
   - component: {fileID: 204}
-  - component: {fileID: 205}
-  - component: {fileID: 206}
-  - component: {fileID: 207}
   m_Layer: 0
   m_Name: Firework System
   m_TagString: Untagged
@@ -329,7 +326,7 @@ MonoBehaviour:
   _notoSansFontAsset: {fileID: 11400000, guid: eb90e1cabfac04a88a836693145a636f, type: 2}
   _panelSize: {x: 360, y: 460}
   _margin: 24
-  _rowHeight: 28
+  _rowHeight: 44
   _toggleKey: 9
   _infoToggleKey: 60
 --- !u!114 &204
@@ -353,55 +350,6 @@ MonoBehaviour:
   _maximumExplosionVolume: 1
   _launchSoundDurationRatio: 0.5
   _silenceBeforeExplosion: 0.05
---- !u!114 &205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82399b1107f94f69a83c06c898866f8a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  _settings: {fileID: 11400000, guid: 87e4db4d3af24e3a831fc212ea030022, type: 2}
-  _port: 8080
-  _maximumMessageBytes: 4096
---- !u!114 &206
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6732a75e64f2414d99b1e672a025e7c9, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  _webServer: {fileID: 205}
-  _settings: {fileID: 11400000, guid: 87e4db4d3af24e3a831fc212ea030022, type: 2}
-  _launcher: {fileID: 202}
-  _maximumCommandsPerFrame: 10
---- !u!114 &207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ddf4f11e9db4d24acb9a651621b1434, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  _webServer: {fileID: 205}
-  _launcher: {fileID: 202}
-  _showDelayAfterCompleted: 3
-  _qrDisplaySize: 296
-  _margin: 24
-  _modulePixelSize: 8
 --- !u!1 &300
 GameObject:
   m_ObjectHideFlags: 0

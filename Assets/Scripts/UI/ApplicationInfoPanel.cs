@@ -51,7 +51,7 @@ namespace Fireworks
             panel.anchorMin = new Vector2(0.5f, 0.5f);
             panel.anchorMax = new Vector2(0.5f, 0.5f);
             panel.pivot = new Vector2(0.5f, 0.5f);
-            panel.sizeDelta = new Vector2(460f, 300f);
+            panel.sizeDelta = new Vector2(420f, 340f);
             panelObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.9f);
 
             VerticalLayoutGroup layout = panelObject.AddComponent<VerticalLayoutGroup>();
@@ -67,7 +67,9 @@ namespace Fireworks
             RuntimeUiFactory.CreateText("Version", panel, "バージョン " + Application.version, 18, TextAlignmentOptions.MidlineLeft, font)
                 .gameObject.AddComponent<LayoutElement>().preferredHeight = rowHeight;
             RuntimeUiFactory.CreateButton(panel, "サードパーティーライセンス", rowHeight * 1.2f, font, _licensePanel.Show);
+#if !UNITY_WEBGL
             RuntimeUiFactory.CreateButton(panel, "アプリを終了", rowHeight * 1.2f, font, QuitApplication);
+#endif
             RuntimeUiFactory.CreateButton(panel, "閉じる", rowHeight * 1.2f, font, onClose);
             return panelObject;
         }

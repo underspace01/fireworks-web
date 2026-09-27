@@ -134,6 +134,7 @@ namespace Fireworks
                     lifetime * (1f - _burstLifetimeVariationRatio),
                     lifetime * (1f + _burstLifetimeVariationRatio));
                 main.startSpeed = speed;
+                // 開花径・粒・尾・重力の縮尺を画面の向きによって変えない。
                 main.startSizeMultiplier = _particleSize * selection.Size.VisualScale;
                 // multiplierプロパティは基準値への乗算ではなく値自体を上書きする。
                 main.gravityModifier = _burstGravityModifier * selection.Effect.GravityMultiplier;

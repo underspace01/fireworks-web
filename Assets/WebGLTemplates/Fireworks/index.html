@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>{{{ PRODUCT_NAME }}}</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #000; color: white; font-family: sans-serif; }
+    body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    #unity-canvas { display: block; width: 100%; height: 100%; touch-action: none; outline: none; -webkit-user-select: none; user-select: none; }
+    #status { position: fixed; inset: 0; display: grid; place-content: center; text-align: center; padding: 24px; background: #080c16; }
+    #status[hidden], #start[hidden] { display: none; }
+    button { font: inherit; color: white; background: #334d80; padding: 16px 24px; border: 0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <canvas id="unity-canvas" tabindex="0" aria-label="花火シミュレーション"></canvas>
+  <div id="status" role="status"><p id="message">読み込み中…</p><button id="start" hidden>はじめる</button></div>
+  <script>
+    const MAX_PIXEL_RATIO = 2;
+    const canvas = document.getElementById('unity-canvas');
+    const status = document.getElementById('status');
+    const message = document.getElementById('message');
+    const start = document.getElementById('start');
+    const buildUrl = 'Build';
+    const config = {
+      dataUrl: buildUrl + '/{{{ DATA_FILENAME }}}',
+      frameworkUrl: buildUrl + '/{{{ FRAMEWORK_FILENAME }}}',
+      codeUrl: buildUrl + '/{{{ CODE_FILENAME }}}',
+      streamingAssetsUrl: 'StreamingAssets',
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO),
+      showBanner: (text, type) => {
+        if (type === 'error') {
+          status.hidden = false;
+          start.hidden = true;
+          message.textContent = text;
+        }
+      }
+    };
+    const loader = document.createElement('script');
+    loader.src = buildUrl + '/{{{ LOADER_FILENAME }}}';
+    loader.onerror = () => { message.textContent = '読み込みに失敗しました。ページを再読み込みしてください。'; };
+    loader.onload = () => {
+      createUnityInstance(canvas, config, progress => {
+        message.textContent = '読み込み中… ' + Math.round(progress * 100) + '%';
+      }).then(() => {
+        message.textContent = '画面をタップして花火を打ち上げます';
+        start.hidden = false;
+        start.onclick = () => { status.hidden = true; canvas.focus(); };
+      }).catch(error => { message.textContent = '起動できませんでした: ' + error; });
+    };
+    if (window.location.protocol === 'file:') {
+      message.textContent = 'このページはファイルを直接開いて起動できません。Unityの「Build And Run」、またはHTTP/HTTPSのWebサーバーから開いてください。';
+    } else {
+      document.body.appendChild(loader);
+    }
+  </script>
+</body>
+</html>

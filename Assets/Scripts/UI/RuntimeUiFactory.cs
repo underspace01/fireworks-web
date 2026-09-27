@@ -37,7 +37,32 @@ namespace Fireworks
             return text;
         }
 
-        public static void CreateButton(
+        // ビューポートだけを固定し、内容の高さはレイアウトから求める。
+        public static RectTransform CreateScrollContent(RectTransform parent)
+        {
+            var scroll = parent.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();
+            scroll.horizontal = false;
+            scroll.movementType = UnityEngine.UI.ScrollRect.MovementType.Clamped;
+            var viewport = CreateObject("Viewport", parent).GetComponent<RectTransform>();
+            viewport.anchorMin = Vector2.zero;
+            viewport.anchorMax = Vector2.one;
+            viewport.offsetMin = Vector2.zero;
+            viewport.offsetMax = Vector2.zero;
+            viewport.gameObject.AddComponent<UnityEngine.UI.Image>().color = Color.white;
+            viewport.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic = false;
+            var content = CreateObject("Content", viewport).GetComponent<RectTransform>();
+            content.anchorMin = new Vector2(0f, 1f);
+            content.anchorMax = Vector2.one;
+            content.pivot = new Vector2(0.5f, 1f);
+            content.sizeDelta = Vector2.zero;
+            content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>().verticalFit =
+                UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
+            scroll.viewport = viewport;
+            scroll.content = content;
+            return content;
+        }
+
+        public static RectTransform CreateButton(
             RectTransform parent,
             string label,
             float height,
@@ -50,6 +75,7 @@ namespace Fireworks
             button.onClick.AddListener(action);
             CreateText("Text", buttonObject.GetComponent<RectTransform>(), label, 18, TextAlignmentOptions.Midline, font);
             buttonObject.AddComponent<LayoutElement>().preferredHeight = height;
+            return buttonObject.GetComponent<RectTransform>();
         }
     }
 }

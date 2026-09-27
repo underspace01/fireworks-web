@@ -16,9 +16,9 @@ Unity Input System
 
 Particle System
 
-## Network
+## Platform
 
-HTTP
+Unity Web（WebGL）。操作から描画まで端末内で実行し、LAN通信による遠隔操作は行わない。HTTP/HTTPSはビルドと同梱ファイルの配信にのみ使用する。
 
 ## Data
 
@@ -30,7 +30,7 @@ uGUI
 
 日本語テキストはTextMeshProとNoto Sans CJK JPを使用する。
 
-待機中のLAN操作用QRコードは、`LanAccessQrDisplay` がZXing.Netで生成し、uGUIの `RawImage` として右下に表示する。
+タップとクリックはuGUIの全面ボタンから受け付ける。小さな歯車アイコンだけを常時表示し、情報画面は設定パネル内から開く。パネル表示中は画面タップによる打上を停止する。CanvasScalerは短辺480を基準にExpandで拡縮する。
 
 ## Scene
 
@@ -60,11 +60,11 @@ UI
 
 StreamingAssets
 
-文字花火とPCのuGUIで共用するNoto Sans CJK JP Font Assetは `Assets/Art/Fonts` に置く。`TextFirework.prefab` とMainSceneの `FireworkDebugUI` がInspector参照し、このフォントの読込みにResourcesは使用しない。
+文字花火とuGUIで共用するNoto Sans CJK JP Font Assetは `Assets/Art/Fonts` に置く。`TextFirework.prefab` とMainSceneの `FireworkDebugUI` がInspector参照し、このフォントの読込みにResourcesは使用しない。
 
-ZXing.Netの通知とApache License 2.0本文、Noto Sans CJK JPのOFL 1.1本文は、`StreamingAssets/ThirdPartyLicenses.txt` としてビルドに含める。`ThirdPartyLicensePanel` がこのファイルをデバッグUIのスクロールパネルに表示する。フォント付属の `OFL.txt` も原本として保持する。
+Noto Sans CJK JPのOFL 1.1本文は、`StreamingAssets/ThirdPartyLicenses.txt` としてビルドに含める。`ThirdPartyLicensePanel` がこのファイルを情報UIのスクロールパネルに表示する。フォント付属の `OFL.txt` も原本として保持する。
 
-実行時のPC UIは責務ごとに分割する。`FireworkDebugUI` はCanvas・キー入力・カーソル・各パネルの表示状態を調停し、`FireworkParameterPanel` は花火パラメーターと打上操作、`ApplicationInfoPanel` はバージョン表示と終了操作、`ThirdPartyLicensePanel` はライセンス本文の読込みと表示を担当する。共通のuGUI生成処理は `RuntimeUiFactory` に集約する。
+実行時のUIは責務ごとに分割する。`FireworkDebugUI` はCanvas・キー入力・タップ入力・各パネルの表示状態を調停し、`FireworkParameterPanel` は花火パラメーターと打上操作、`ApplicationInfoPanel` はバージョン表示（Webでは終了ボタンなし）、`ThirdPartyLicensePanel` はライセンス本文の読込みと表示を担当する。共通のuGUI生成処理は `RuntimeUiFactory` に集約する。
 
 Addressablesは使用しない。
 
@@ -89,3 +89,7 @@ FireworkSettingsは、花火のサイズ・種類Prefab・色、打上高度の�
 まず動くものを作る。
 
 その後演出を追加する。
+
+## Webビルド
+
+`FireworkWebBuild` のEditorメニューでWeb設定を適用し、`Builds/Web`へビルドする。`Assets/WebGLTemplates/Fireworks`で画面回転とセーフエリアに対応し、描画ピクセル比は最大2とする。Gzipと展開フォールバックを使用する。ライセンス本文はUnityWebRequestで非同期に取得する。

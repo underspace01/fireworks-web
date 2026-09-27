@@ -1,4 +1,5 @@
 using System.IO;
+using UnityEngine.Networking;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,9 @@ namespace Fireworks
         private const string LICENSE_FILE_NAME = "ThirdPartyLicenses.txt";
 
         private readonly GameObject _root;
+        private TextMeshProUGUI _licenseText;
+        private bool _isLoading;
+        private bool _isLoaded;
 
         public ThirdPartyLicensePanel(RectTransform canvasRoot, float rowHeight, TMP_FontAsset font)
         {
@@ -24,6 +28,7 @@ namespace Fireworks
         {
             _root.transform.SetAsLastSibling();
             _root.SetActive(true);
+            if (!_isLoaded && !_isLoading) LoadLicenseText();
         }
         public void Hide() => _root.SetActive(false);
 
@@ -34,7 +39,10 @@ namespace Fireworks
             panel.anchorMin = new Vector2(0.5f, 0.5f);
             panel.anchorMax = new Vector2(0.5f, 0.5f);
             panel.pivot = new Vector2(0.5f, 0.5f);
-            panel.sizeDelta = new Vector2(900f, 700f);
+            panel.anchorMin = Vector2.zero;
+            panel.anchorMax = Vector2.one;
+            panel.offsetMin = new Vector2(24f, 24f);
+            panel.offsetMax = new Vector2(-24f, -24f);
             panelObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.9f);
 
             VerticalLayoutGroup layout = panelObject.AddComponent<VerticalLayoutGroup>();
@@ -83,22 +91,32 @@ namespace Fireworks
             contentObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             TextMeshProUGUI licenseText = RuntimeUiFactory.CreateText(
-                "License Text", content, LoadLicenseText(), 16, TextAlignmentOptions.TopLeft, font);
+                "License Text", content, "読込み中…", 16, TextAlignmentOptions.TopLeft, font);
+            _licenseText = licenseText;
             licenseText.textWrappingMode = TextWrappingModes.Normal;
             licenseText.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             scrollRect.viewport = viewport;
             scrollRect.content = content;
         }
 
-        private string LoadLicenseText()
+        private void LoadLicenseText()
         {
             string filePath = Path.Combine(Application.streamingAssetsPath, LICENSE_FILE_NAME);
-            if (File.Exists(filePath))
+            // WebではStreamingAssetsはURLになるため、ファイルAPIを使わない。
+            string url = filePath.Contains("://") ? filePath : new System.Uri(filePath).AbsoluteUri;
+            _isLoading = true;
+            UnityWebRequest request = UnityWebRequest.Get(url);
+            request.SendWebRequest().completed += _ =>
             {
-                return File.ReadAllText(filePath);
-            }
-
-            return "ライセンス情報を読み込めませんでした。配布パッケージにライセンス本文が含まれていることを確認してください。";
+                _isLoading = false;
+                _isLoaded = request.result == UnityWebRequest.Result.Success;
+                if (_licenseText != null)
+                {
+                    _licenseText.text = _isLoaded ? request.downloadHandler.text :
+                        "ライセンス情報を読み込めませんでした。画面を閉じて再度お試しください。";
+                }
+                request.Dispose();
+            };
         }
     }
 }

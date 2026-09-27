@@ -21,12 +21,17 @@
 
 ---
 
-## Phase3
+## Phase3（旧LAN機能・廃止）
 
-- [x] HTTP Server
-- [x] Web操作画面
-- [x] Fireイベント
-- [x] LAN接続
+- HTTP Server・遠隔Web操作画面・LAN接続・QRコードを撤去
+
+## Web移行
+
+- [x] 同一ブラウザ内での花火操作と描画
+- [x] 縦横対応のuGUIと画面高基準の花火表示
+- [x] Webテンプレートとビルドメニュー
+- [x] Webビルド出力のHTTP配信・Chrome起動確認
+- [ ] iOS Safari・Android Chromeの実機確認
 
 ---
 

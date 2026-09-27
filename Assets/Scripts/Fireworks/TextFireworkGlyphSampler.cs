@@ -10,6 +10,7 @@ namespace Fireworks
         private const int SAMPLES_PER_CHARACTER_SIDE = 12;
         private const int MAXIMUM_PARTICLE_COUNT = 800;
         private const float GLYPH_ALPHA_THRESHOLD = 0.5f;
+        private const float MAXIMUM_VIEWPORT_FRACTION = 0.75f;
 
         public static List<Vector3> CreatePositions(
             Transform parent, string value, TMP_FontAsset fontAsset, Camera targetCamera, float visualScale)
@@ -26,10 +27,29 @@ namespace Fireworks
             textMesh.fontSize = 5f * visualScale;
             textMesh.ForceMeshUpdate();
 
-            float maximumWidth = targetCamera.orthographicSize * targetCamera.aspect * 1.5f;
+            float maximumWidth = targetCamera.orthographicSize * 2f *
+                MAXIMUM_VIEWPORT_FRACTION;
             float textScale = textMesh.preferredWidth > maximumWidth && textMesh.preferredWidth > 0f
                 ? maximumWidth / textMesh.preferredWidth : 1f;
             List<Vector3> positions = CollectPositions(textMesh.textInfo, fontAsset.atlasTexture, textScale);
+            // 収まる文字列は位置を補正し、画面幅を超える場合は縮小せず中央で見切れを許容する。
+            if (positions.Count > 0)
+            {
+                float minimumX = float.PositiveInfinity;
+                float maximumX = float.NegativeInfinity;
+                foreach (Vector3 position in positions)
+                {
+                    minimumX = Mathf.Min(minimumX, position.x);
+                    maximumX = Mathf.Max(maximumX, position.x);
+                }
+                float halfWidth = targetCamera.orthographicSize * targetCamera.aspect;
+                float centerX = targetCamera.transform.position.x - parent.position.x;
+                float offset = maximumX - minimumX > halfWidth * 2f
+                    ? centerX - (minimumX + maximumX) * 0.5f
+                    : Mathf.Clamp(0f, centerX - halfWidth - minimumX, centerX + halfWidth - maximumX);
+                for (int index = 0; index < positions.Count; index++)
+                    positions[index] += Vector3.right * offset;
+            }
             Object.Destroy(layoutObject);
             return positions;
         }

@@ -45,13 +45,8 @@ namespace Fireworks
 
         private void Update()
         {
-            if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
-            {
-                LaunchFirework();
-            }
-
-            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame &&
-                !FireworkDebugUI.IsPointerOverUi())
+            if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame &&
+                !FireworkDebugUI.IsPanelVisible)
             {
                 LaunchFirework();
             }
@@ -163,8 +158,10 @@ namespace Fireworks
             float verticalMargin = GetVerticalViewportMargin(burstRadius);
             float minimumViewportX = Mathf.Max(_minimumLaunchViewportX, horizontalMargin);
             float maximumViewportX = Mathf.Min(_maximumLaunchViewportX, 1f - horizontalMargin);
+            // 縦画面で中央に固定する場合も乱数を消費し、高さや粒子の揺らぎを画面比率で変えない。
+            float randomViewportX = Random.value;
             float viewportX = minimumViewportX <= maximumViewportX
-                ? Random.Range(minimumViewportX, maximumViewportX)
+                ? Mathf.Lerp(minimumViewportX, maximumViewportX, randomViewportX)
                 : 0.5f;
             Vector3 launchPosition = GetViewportPosition(viewportX, _launchViewportY);
             float launchHeight = _settings.GetRandomLaunchHeight(selection.Size);
@@ -210,6 +207,7 @@ namespace Fireworks
         private float GetBurstTravelRadius(float burstDiameter)
         {
             float screenHeight = _settings.ScreenHeight;
+            // 画面の向きによらず、打上高度と開花直径を同じ高さ基準で換算する。
             float viewportHeight = _targetCamera.orthographicSize * 2f;
             if (screenHeight <= 0f || viewportHeight <= 0f)
             {

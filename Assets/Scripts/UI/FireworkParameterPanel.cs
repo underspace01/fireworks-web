@@ -15,6 +15,7 @@ namespace Fireworks
         private readonly float _rowHeight;
         private readonly TMP_FontAsset _font;
         private readonly GameObject _root;
+        private readonly UnityAction _onShowInfo;
 
         private TMP_InputField _textFireworkInput;
         private GameObject _changeColorRow;
@@ -31,19 +32,22 @@ namespace Fireworks
             Vector2 panelSize,
             float margin,
             float rowHeight,
-            TMP_FontAsset font)
+            TMP_FontAsset font,
+            UnityAction onShowInfo)
         {
             _launcher = launcher;
             _settings = settings;
             _panelSize = panelSize;
             _rowHeight = rowHeight;
             _font = font;
+            _onShowInfo = onShowInfo;
             _root = CreatePanel(canvasRoot, margin);
             RectTransform = _root.GetComponent<RectTransform>();
         }
 
         public RectTransform RectTransform { get; }
         public bool IsVisible => _root.activeSelf;
+        public string TextValue => _textFireworkInput != null ? _textFireworkInput.text : string.Empty;
 
         public void SetVisible(bool isVisible)
         {
@@ -61,7 +65,12 @@ namespace Fireworks
             panel.sizeDelta = _panelSize;
             panelObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.7f);
 
-            VerticalLayoutGroup layout = panelObject.AddComponent<VerticalLayoutGroup>();
+            panel.anchorMin = Vector2.zero;
+            panel.anchorMax = Vector2.one;
+            panel.offsetMin = new Vector2(margin, margin + _rowHeight * 2f);
+            panel.offsetMax = new Vector2(-margin, -margin);
+            RectTransform content = RuntimeUiFactory.CreateScrollContent(panel);
+            VerticalLayoutGroup layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.padding = new RectOffset(16, 16, 16, 16);
             layout.spacing = 8f;
             layout.childControlWidth = true;
@@ -69,6 +78,7 @@ namespace Fireworks
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
 
+            panel = content;
             RuntimeUiFactory.CreateText("Title", panel, "花火パラメーター", 24, TextAlignmentOptions.MidlineLeft, _font)
                 .gameObject.AddComponent<LayoutElement>().preferredHeight = _rowHeight;
             CreateSelectionRow(panel, "サイズ", CreateSizeOptions(), value => _selectedSizeIndex = value, out _);
@@ -77,7 +87,8 @@ namespace Fireworks
             CreateSelectionRow(panel, "変化色", CreateColorOptions(), value => _selectedChangeColorIndex = value, out _changeColorRow);
             _textFireworkInput = CreateTextInputRow(panel, out _textFireworkRow);
             RuntimeUiFactory.CreateButton(panel, "指定して打ち上げる", _rowHeight * 1.2f, _font, LaunchSelectedFirework);
-            RuntimeUiFactory.CreateButton(panel, "ランダムで打ち上げる", _rowHeight * 1.2f, _font, _launcher.LaunchFirework);
+            RuntimeUiFactory.CreateButton(panel, "ランダムで打ち上げる", _rowHeight * 1.2f, _font, () => _launcher.LaunchRandomFirework(TextValue));
+            RuntimeUiFactory.CreateButton(panel, "アプリ情報", _rowHeight * 1.2f, _font, _onShowInfo);
             RefreshStructureVisibility();
             return panelObject;
         }
@@ -178,13 +189,26 @@ namespace Fireworks
             template.pivot = new Vector2(0.5f, 1f);
             template.sizeDelta = new Vector2(0f, _rowHeight * 6f);
             templateObject.AddComponent<Image>().color = new Color(0.1f, 0.15f, 0.25f, 1f);
+            var scroll = templateObject.AddComponent<UnityEngine.UI.ScrollRect>();
+            scroll.horizontal = false;
+            scroll.movementType = UnityEngine.UI.ScrollRect.MovementType.Clamped;
+            var viewport = RuntimeUiFactory.CreateObject("Viewport", template).GetComponent<RectTransform>();
+            viewport.anchorMin = Vector2.zero;
+            viewport.anchorMax = Vector2.one;
+            viewport.offsetMin = Vector2.zero;
+            viewport.offsetMax = Vector2.zero;
+            viewport.gameObject.AddComponent<UnityEngine.UI.Image>();
+            viewport.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic = false;
 
-            GameObject contentObject = RuntimeUiFactory.CreateObject("Content", template);
+            GameObject contentObject = RuntimeUiFactory.CreateObject("Content", viewport);
             RectTransform content = contentObject.GetComponent<RectTransform>();
-            content.anchorMin = Vector2.zero;
+            content.anchorMin = new Vector2(0f, 1f);
             content.anchorMax = Vector2.one;
-            content.offsetMin = Vector2.zero;
-            content.offsetMax = Vector2.zero;
+            content.pivot = new Vector2(0.5f, 1f);
+            content.sizeDelta = new Vector2(0f, _rowHeight);
+            // 選択肢の高さはTMP_Dropdownが更新するため、ContentSizeFitterは付けない。
+            scroll.viewport = viewport;
+            scroll.content = content;
 
             GameObject itemObject = RuntimeUiFactory.CreateObject("Item", content);
             RectTransform item = itemObject.GetComponent<RectTransform>();
