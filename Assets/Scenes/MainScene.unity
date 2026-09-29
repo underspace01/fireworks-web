@@ -339,10 +339,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43268c0c61124facabb00feaf4505cbd, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  _launchClip: {fileID: 8300000, guid: 2b68c8f6083524392b1f84facf84a2f9, type: 3}
-  _explosionClip: {fileID: 8300000, guid: 3284de5396216471c9ef4f245b8ef8b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _launchClip: {fileID: 8300000, guid: 384787149c9db42b2a644239bec66f3f, type: 3}
+  _explosionClip: {fileID: 8300000, guid: f5a20c84f7aad4b0d8b35ab6dcbd3269, type: 3}
   _soundDelay: 0.5
   _minimumLaunchVolume: 0.2
   _maximumLaunchVolume: 0.5
@@ -392,8 +392,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_IsGlobal: 1
   priority: 0
   blendDistance: 0
