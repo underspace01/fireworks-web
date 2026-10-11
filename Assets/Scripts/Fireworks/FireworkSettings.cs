@@ -21,10 +21,10 @@ namespace Fireworks
 
         [Header("表示高度")]
         [SerializeField, Min(0f)]
-        private float _screenBottomHeight = 100f;
+        private float _screenBottomHeight = 50f;
 
         [SerializeField, Min(0f)]
-        private float _screenTopHeight = 500f;
+        private float _screenTopHeight = 450f;
 
         public bool TryCreateRandomSelection(out FireworkSelection selection)
         {

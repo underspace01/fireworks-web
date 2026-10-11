@@ -28,6 +28,9 @@ namespace Fireworks
         [SerializeField, Range(0f, 1f)]
         private float _launchViewportY = 0f;
 
+        [SerializeField, Range(0f, 0.5f)]
+        private float _maximumTopOverflowRatio = 0.15f;
+
         private int _activeFireworkCount;
 
         public bool HasActiveFireworks => _activeFireworkCount > 0;
@@ -167,7 +170,8 @@ namespace Fireworks
             float launchHeight = _settings.GetRandomLaunchHeight(selection.Size);
             float heightRatio = _settings.GetLaunchHeightNormalized(launchHeight);
             float burstViewportY = heightRatio;
-            burstViewportY = Mathf.Clamp(burstViewportY, verticalMargin, 1f - verticalMargin);
+            // 大玉を低く押し下げすぎないよう、上端には調整可能な見切れを許容する。
+            burstViewportY = Mathf.Clamp(burstViewportY, verticalMargin, 1f - verticalMargin + _maximumTopOverflowRatio);
             Vector3 burstPosition = GetViewportPosition(viewportX, burstViewportY);
             float sizeRatio = _settings.GetSizeNormalized(selection.Size);
             if (_fireworkAudio != null)

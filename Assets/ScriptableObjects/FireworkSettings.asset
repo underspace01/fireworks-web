@@ -77,5 +77,5 @@ MonoBehaviour:
     _displayName: "\u767D"
     _value: {r: 1, g: 1, b: 1, a: 1}
   _launchHeightVariationRatio: 0.05
-  _screenBottomHeight: 100
-  _screenTopHeight: 500
+  _screenBottomHeight: 50
+  _screenTopHeight: 450
