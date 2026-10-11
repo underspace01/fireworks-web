@@ -19,6 +19,7 @@ namespace Fireworks
         [SerializeField, Min(1f)] private float _settingsButtonSize = 56f;
         [SerializeField, Min(1f)] private float _settingsIconSize = 24f;
         [SerializeField, Range(0f, 1f)] private float _settingsIconOpacity = 0.45f;
+        [SerializeField, Min(0.1f)] private float _settingsHoldDuration = 0.5f;
         [SerializeField] private Key _toggleKey = Key.Slash;
         [SerializeField] private Key _infoToggleKey = Key.Escape;
 
@@ -173,8 +174,12 @@ namespace Fireworks
             buttonRect.anchoredPosition = new Vector2(-_margin, _margin);
             // 見た目は小さく保ち、透明な領域で指のタップを受け付ける。
             buttonObject.AddComponent<UnityEngine.UI.Image>().color = Color.clear;
-            var button = buttonObject.AddComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(ToggleVisibility);
+            var button = buttonObject.AddComponent<SettingsHoldButton>();
+            button.onClick.AddListener(() =>
+            {
+                if (IsPanelVisible) ToggleVisibility();
+                else _launcher.LaunchRandomFirework(_parameterPanel.TextValue);
+            });
 
             GameObject iconObject = RuntimeUiFactory.CreateObject("Settings Icon", buttonRect);
             RectTransform iconRect = iconObject.GetComponent<RectTransform>();
@@ -186,6 +191,7 @@ namespace Fireworks
             // 透明なタップ領域の色遷移をアイコンへ引き継がず、常に見つけられる濃さに保つ。
             button.transition = Selectable.Transition.None;
             icon.color = new Color(1f, 1f, 1f, _settingsIconOpacity);
+            button.Initialize(_settingsHoldDuration, icon, ToggleVisibility, () => !IsPanelVisible);
         }
 
         private void CreateEventSystem()

@@ -67,6 +67,7 @@ Noto Sans CJK JPのOFL 1.1本文は、`StreamingAssets/ThirdPartyLicenses.txt` �
 実行時のUIは責務ごとに分割する。`FireworkDebugUI` はCanvas・キー入力・タップ入力・各パネルの表示状態を調停し、`FireworkParameterPanel` は花火パラメーターと打上操作、`ApplicationInfoPanel` はバージョン表示（Webでは終了ボタンなし）、`ThirdPartyLicensePanel` はライセンス本文の読込みと表示を担当する。共通のuGUI生成処理は `RuntimeUiFactory` に集約する。
 
 Addressablesは使用しない。
+歯車の入力は `SettingsHoldButton` がuGUIイベントと押下中だけ動くCoroutineで短いタップ・長押しを分離する。`SettingsIconGraphic` が長押しの進捗円弧を描画する。
 
 ---
 
