@@ -157,10 +157,12 @@ namespace Fireworks
             rect.offsetMax = Vector2.zero;
             surface.AddComponent<UnityEngine.UI.Image>().color = Color.clear;
             // UIイベントに統一し、タッチと互換マウス入力の二重打上を防ぐ。
-            surface.AddComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
-            {
-                if (!IsPanelVisible) _launcher.LaunchRandomFirework(_parameterPanel.TextValue);
-            });
+            surface.AddComponent<PointerPositionButton>().PositionClicked += HandleLaunchClick;
+        }
+
+        private void HandleLaunchClick(Vector2 screenPosition)
+        {
+            if (!IsPanelVisible) _launcher.LaunchFireworkAtScreenPosition(screenPosition, _parameterPanel.TextValue);
         }
 
         private void CreateSettingsButton(RectTransform canvasRoot)
@@ -175,10 +177,10 @@ namespace Fireworks
             // 見た目は小さく保ち、透明な領域で指のタップを受け付ける。
             buttonObject.AddComponent<UnityEngine.UI.Image>().color = Color.clear;
             var button = buttonObject.AddComponent<SettingsHoldButton>();
+            button.PositionClicked += HandleLaunchClick;
             button.onClick.AddListener(() =>
             {
                 if (IsPanelVisible) ToggleVisibility();
-                else _launcher.LaunchRandomFirework(_parameterPanel.TextValue);
             });
 
             GameObject iconObject = RuntimeUiFactory.CreateObject("Settings Icon", buttonRect);

@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 namespace Fireworks
 {
     /// <summary>短いタップと長押しを分け、設定の誤操作を防ぐ。</summary>
-    public sealed class SettingsHoldButton : UnityEngine.UI.Button
+    public sealed class SettingsHoldButton : PointerPositionButton
     {
         private float _holdDuration;
         private SettingsIconGraphic _icon;

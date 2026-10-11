@@ -31,6 +31,9 @@ namespace Fireworks
         [SerializeField, Range(0f, 0.5f)]
         private float _maximumTopOverflowRatio = 0.15f;
 
+        [SerializeField, Range(0f, 0.1f)]
+        private float _pointerHorizontalVariationRatio = 0.03f;
+
         private int _activeFireworkCount;
 
         public bool HasActiveFireworks => _activeFireworkCount > 0;
@@ -71,6 +74,26 @@ namespace Fireworks
             LaunchFirework(selection);
         }
 
+        public void LaunchFireworkAtScreenPosition(Vector2 screenPosition, string text)
+        {
+            if (_settings == null || _targetCamera == null) return;
+            Vector3 viewportPosition = _targetCamera.ScreenToViewportPoint(screenPosition);
+            int sizeIndex = _settings.GetClosestSizeIndex(viewportPosition.y);
+            if (!_settings.TryCreateRandomSelection(sizeIndex, out FireworkSelection selection)) return;
+            // 狙った位置の近くに自然なばらつきを加え、端の補正は既存の配置処理に任せる。
+            float viewportX = viewportPosition.x + Random.Range(
+                -_pointerHorizontalVariationRatio, _pointerHorizontalVariationRatio);
+            if (selection.Effect.IsTextFirework)
+            {
+                string launchText = string.IsNullOrWhiteSpace(text)
+                    ? RANDOM_TEXT_CHARACTERS[Random.Range(0, RANDOM_TEXT_CHARACTERS.Length)].ToString()
+                    : text.Trim();
+                LaunchTextFirework(launchText, selection, viewportX);
+                return;
+            }
+            LaunchFirework(selection, viewportX);
+        }
+
         public void LaunchFirework(int sizeIndex, int structureIndex, int colorIndex, int changeColorIndex)
         {
             if (_settings == null || _targetCamera == null ||
@@ -96,10 +119,19 @@ namespace Fireworks
                 return;
             }
 
+            LaunchTextFirework(text, selection);
+        }
+
+        private void LaunchTextFirework(string text, FireworkSelection selection, float? requestedViewportX = null)
+        {
+            if (string.IsNullOrWhiteSpace(text) || text.Length > 6 || _targetCamera == null ||
+                selection.Effect == null || selection.Effect.TextEffect == null) return;
             FireworkSizeDefinition size = selection.Size;
             Color color = selection.Color;
             float sizeRatio = _settings.GetSizeNormalized(size);
-            float viewportX = Random.Range(_minimumLaunchViewportX, _maximumLaunchViewportX);
+            float viewportX = requestedViewportX.HasValue
+                ? Mathf.Clamp(requestedViewportX.Value, _minimumLaunchViewportX, _maximumLaunchViewportX)
+                : Random.Range(_minimumLaunchViewportX, _maximumLaunchViewportX);
             Vector3 launchPosition = GetViewportPosition(viewportX, _launchViewportY);
             float burstViewportY = Mathf.Clamp(_settings.GetLaunchHeightNormalized(
                 _settings.GetRandomLaunchHeight(size)), 0.2f, 0.8f);
@@ -141,9 +173,9 @@ namespace Fireworks
                 Random.Range(0, _settings.ColorCount));
         }
 
-        private void LaunchFirework(FireworkSelection selection)
+        private void LaunchFirework(FireworkSelection selection, float? requestedViewportX = null)
         {
-            if (selection.Effect == null)
+            if (selection.Effect == null || _targetCamera == null)
             {
                 return;
             }
@@ -164,7 +196,9 @@ namespace Fireworks
             // 縦画面で中央に固定する場合も乱数を消費し、高さや粒子の揺らぎを画面比率で変えない。
             float randomViewportX = Random.value;
             float viewportX = minimumViewportX <= maximumViewportX
-                ? Mathf.Lerp(minimumViewportX, maximumViewportX, randomViewportX)
+                ? requestedViewportX.HasValue
+                    ? Mathf.Clamp(requestedViewportX.Value, minimumViewportX, maximumViewportX)
+                    : Mathf.Lerp(minimumViewportX, maximumViewportX, randomViewportX)
                 : 0.5f;
             Vector3 launchPosition = GetViewportPosition(viewportX, _launchViewportY);
             float launchHeight = _settings.GetRandomLaunchHeight(selection.Size);

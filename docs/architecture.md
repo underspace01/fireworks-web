@@ -30,7 +30,7 @@ uGUI
 
 日本語テキストはTextMeshProとNoto Sans CJK JPを使用する。
 
-タップとクリックはuGUIの全面ボタンから受け付ける。小さな歯車アイコンだけを常時表示し、情報画面は設定パネル内から開く。パネル表示中は画面タップによる打上を停止する。CanvasScalerは短辺480を基準にExpandで拡縮する。
+タップとクリックはuGUIの全面ボタン（`PointerPositionButton`）から位置付きイベントとして受け付ける。`FireworkSettings` が入力高度に最も近いサイズを選び、`FireworkLauncher` が入力の横位置と既存の高度仕様で打ち上げる。小さな歯車アイコンだけを常時表示し、情報画面は設定パネル内から開く。パネル表示中は画面タップによる打上を停止する。CanvasScalerは短辺480を基準にExpandで拡縮する。
 
 ## Scene
 

@@ -29,15 +29,22 @@ namespace Fireworks
         public bool TryCreateRandomSelection(out FireworkSelection selection)
         {
             selection = default;
+            if (SizeCount == 0) return false;
+            return TryCreateRandomSelection(UnityEngine.Random.Range(0, SizeCount), out selection);
+        }
 
-            if (_sizes == null || _sizes.Length == 0 ||
+        public bool TryCreateRandomSelection(int sizeIndex, out FireworkSelection selection)
+        {
+            selection = default;
+
+            if (!IsValidIndex(sizeIndex, SizeCount) ||
                 _effects == null || _effects.Length == 0 ||
                 _colors == null || _colors.Length == 0)
             {
                 return false;
             }
 
-            FireworkSizeDefinition size = _sizes[UnityEngine.Random.Range(0, _sizes.Length)];
+            FireworkSizeDefinition size = _sizes[sizeIndex];
             FireworkTypeDefinition effect = _effects[UnityEngine.Random.Range(0, _effects.Length)];
             FireworkColorDefinition color = _colors[UnityEngine.Random.Range(0, _colors.Length)];
             if (effect == null)
@@ -60,6 +67,25 @@ namespace Fireworks
         public int EffectCount => _effects?.Length ?? 0;
         public int ColorCount => _colors?.Length ?? 0;
         public float ScreenHeight => _screenTopHeight - _screenBottomHeight;
+
+        public int GetClosestSizeIndex(float viewportHeight)
+        {
+            float targetHeight = Mathf.Lerp(_screenBottomHeight, _screenTopHeight, Mathf.Clamp01(viewportHeight));
+            int closestIndex = -1;
+            float closestDistance = float.PositiveInfinity;
+            for (int index = 0; index < SizeCount; index++)
+            {
+                float distance = Mathf.Abs(_sizes[index].LaunchHeight - targetHeight);
+                // 境界では低い高度の玉を選び、候補の並び順に依存させない。
+                if (distance < closestDistance || distance == closestDistance &&
+                    closestIndex >= 0 && _sizes[index].LaunchHeight < _sizes[closestIndex].LaunchHeight)
+                {
+                    closestIndex = index;
+                    closestDistance = distance;
+                }
+            }
+            return closestIndex;
+        }
         public bool TryCreateTextSelection(int sizeIndex, int colorIndex, out FireworkSelection selection)
         {
             selection = default;
