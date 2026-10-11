@@ -193,6 +193,12 @@ namespace Fireworks
             float verticalMargin = GetVerticalViewportMargin(burstRadius);
             float minimumViewportX = Mathf.Max(_minimumLaunchViewportX, horizontalMargin);
             float maximumViewportX = Mathf.Min(_maximumLaunchViewportX, 1f - horizontalMargin);
+            // 大玉で横位置が固定される場合は、左右の見切れを許容して揺らぎの範囲を確保する。
+            if (maximumViewportX - minimumViewportX <= _pointerHorizontalVariationRatio * 2f)
+            {
+                minimumViewportX = _minimumLaunchViewportX;
+                maximumViewportX = _maximumLaunchViewportX;
+            }
             // 縦画面で中央に固定する場合も乱数を消費し、高さや粒子の揺らぎを画面比率で変えない。
             float randomViewportX = Random.value;
             float viewportX = minimumViewportX <= maximumViewportX
